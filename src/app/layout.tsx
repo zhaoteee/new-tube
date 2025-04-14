@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-
+import { ClerkProvider } from "@clerk/nextjs";
 const geistSans = Inter({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -17,12 +17,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistSans.className}`}
-      >
-        {children}
-      </body>
-    </html>
+    <ClerkProvider afterSignOutUrl={"/"}>
+      <html lang="en">
+        <body className={`${geistSans.variable} ${geistSans.className}`}>
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
