@@ -18,3 +18,5 @@ export const users = pgTable(
   },
   (t) => [uniqueIndex("clerk_id_idx").on(t.clerkId)]
 );
+
+export type User = typeof users.$inferSelect; // 查询时返回的类型
