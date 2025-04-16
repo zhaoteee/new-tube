@@ -1,4 +1,4 @@
-import { createTRPCRouter, protectedProcedure } from "../init";
+import { createTRPCRouter } from "../init";
 import { categoriesRouter } from "@/modules/categoryes/server/procedures";
 export const appRouter = createTRPCRouter({
   categories: categoriesRouter,
