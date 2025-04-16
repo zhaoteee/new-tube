@@ -6,6 +6,12 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
+/**
+ *
+ * npx drizzle-kit push  提交到数据库
+ * npx drizzle-kit studio
+ */
+
 export const users = pgTable(
   "users",
   {
@@ -20,3 +26,17 @@ export const users = pgTable(
 );
 
 export type User = typeof users.$inferSelect; // 查询时返回的类型
+
+export const categories = pgTable(
+  "categories",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    description: text("description"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex("name_idx").on(t.name)]
+);
+
+export type Categories = typeof categories.$inferSelect; // 查询时返回的类型
