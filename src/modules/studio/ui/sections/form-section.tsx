@@ -193,47 +193,41 @@ function FormSectionSuspense({ videoId }: Props) {
                   thumbnailUrl={video.thumbnailUrl}
                 />
               </div>
-              <div className="px-4 flex flex-col gap-y-6">
-                <div className="flex flex-col gap-x-2">
-                  <div className="flex flex-col gap-y-1">
-                    <p className="text-muted-foreground text-xs">Video link</p>
-                  </div>
-                  <div className="flex items-center gap-x-2">
-                    <Link href={`/videos/${video.id}`}>
-                      <p className="line-clamp-1 text-sm text-blue-500">
-                        {fullUrl}
-                      </p>
-                    </Link>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="shrink-0"
-                      onClick={onCopy}
-                      disabled={isCopied}
-                    >
-                      {isCopied ? <CopyCheckIcon /> : <CopyIcon />}
-                    </Button>
-                  </div>
+              <div className="px-4 flex flex-col gap-x-2">
+                <div className="flex flex-col gap-y-1">
+                  <p className="text-muted-foreground text-xs">Video link</p>
+                </div>
+                <div className="flex items-center gap-x-2">
+                  <Link href={`/videos/${video.id}`}>
+                    <p className="line-clamp-1 text-sm text-blue-500">
+                      {fullUrl}
+                    </p>
+                  </Link>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0"
+                    onClick={onCopy}
+                    disabled={isCopied}
+                  >
+                    {isCopied ? <CopyCheckIcon /> : <CopyIcon />}
+                  </Button>
                 </div>
               </div>
-              <div className="px-4 flex justify-between items-center">
-                <div className="flex flex-col gap-y-1">
-                  <p className="text-muted-foreground text-xs">Video status</p>
-                  <p className="text-sm">
-                    {snakeCaseToTitle(video.muxStatus || "preparing")}
-                  </p>
-                </div>
+              <div className="px-4 flex flex-col gap-y-1">
+                <p className="text-muted-foreground text-xs">Video status</p>
+                <p className="text-sm">
+                  {snakeCaseToTitle(video.muxStatus || "preparing")}
+                </p>
               </div>
-              <div className="px-4 flex justify-between items-center">
-                <div className="flex flex-col gap-y-1">
-                  <p className="text-muted-foreground text-xs">
-                    Subtitles status
-                  </p>
-                  <p className="text-sm">
-                    {snakeCaseToTitle(video.muxTrackStatus || "no_subtitle")}
-                  </p>
-                </div>
+              <div className="px-4 flex flex-col gap-y-1">
+                <p className="text-muted-foreground text-xs">
+                  Subtitles status
+                </p>
+                <p className="text-sm">
+                  {snakeCaseToTitle(video.muxTrackStatus || "no_subtitle")}
+                </p>
               </div>
             </div>
           </div>
