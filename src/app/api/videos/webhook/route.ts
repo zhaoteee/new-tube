@@ -6,6 +6,7 @@ import {
   VideoAssetErroredWebhookEvent,
   VideoAssetReadyWebhookEvent,
   VideoAssetDeletedWebhookEvent,
+  VideoAssetTrackReadyWebhookEvent,
 } from "@mux/mux-node/resources/webhooks";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
@@ -13,7 +14,8 @@ type WebhookEvent =
   | VideoAssetCreatedWebhookEvent
   | VideoAssetErroredWebhookEvent
   | VideoAssetReadyWebhookEvent
-  | VideoAssetDeletedWebhookEvent;
+  | VideoAssetDeletedWebhookEvent
+  | VideoAssetTrackReadyWebhookEvent;
 const SIGNING_SECRET = process.env.MUX_WEBHOOK_SECRET!;
 export const POST = async (request: Request) => {
   if (!SIGNING_SECRET) {
@@ -66,6 +68,41 @@ export const POST = async (request: Request) => {
           duration,
         })
         .where(eq(videos.muxUploadId, data.upload_id));
+      break;
+    }
+    case "video.asset.errored": {
+      const data = payload.data as VideoAssetErroredWebhookEvent["data"];
+      if (!data.upload_id) {
+        return new Response("No upload ID found", { status: 400 });
+      }
+      await db
+        .update(videos)
+        .set({ muxStatus: data.status })
+        .where(eq(videos.muxUploadId, data.upload_id));
+      break;
+    }
+    case "video.asset.deleted": {
+      const data = payload.data as VideoAssetDeletedWebhookEvent["data"];
+      if (!data.upload_id) {
+        return new Response("No upload ID found", { status: 400 });
+      }
+      await db.delete(videos).where(eq(videos.muxUploadId, data.upload_id));
+      break;
+    }
+    case "video.asset.track.ready": {
+      const data = payload.data as VideoAssetTrackReadyWebhookEvent["data"] & {
+        asset_id: string;
+      };
+      const assetId = data.asset_id;
+      const trackId = data.id;
+      const status = data.status;
+      if (!assetId) {
+        return new Response("Asset Id found", { status: 400 });
+      }
+      await db
+        .update(videos)
+        .set({ muxTrackId: trackId, muxStatus: status })
+        .where(eq(videos.muxAssetId, assetId));
       break;
     }
     default:

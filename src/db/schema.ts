@@ -6,8 +6,13 @@ import {
   timestamp,
   uniqueIndex,
   integer,
+  pgEnum,
 } from "drizzle-orm/pg-core";
-
+import {
+  createSelectSchema,
+  createUpdateSchema,
+  createInsertSchema,
+} from "drizzle-zod";
 /**
  *
  * npx drizzle-kit push  提交到数据库
@@ -48,6 +53,8 @@ export const categoriesRelations = relations(users, ({ many }) => ({
   videos: many(videos),
 }));
 
+export const videoVisiblity = pgEnum("video_visibility", ["privite", "public"]);
+
 export const videos = pgTable("videos", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("name").notNull(),
@@ -60,7 +67,8 @@ export const videos = pgTable("videos", {
   muxTrackStatus: text("mux_track_status"),
   thumbnailUrl: text("thumbnail_url"),
   previewUrl: text("preview_url"),
-  duration: integer("duration"),
+  duration: integer("duration").default(0).notNull(),
+  visibility: videoVisiblity("visibility").default("privite").notNull(),
   userId: uuid("user_id")
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
@@ -70,6 +78,10 @@ export const videos = pgTable("videos", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export const videoSelectSchema = createSelectSchema(videos);
+export const videoInsertSchema = createInsertSchema(videos);
+export const videoUpdateSchema = createUpdateSchema(videos);
 
 export const videosRelations = relations(videos, ({ one }) => ({
   user: one(users, { fields: [videos.id], references: [users.id] }),

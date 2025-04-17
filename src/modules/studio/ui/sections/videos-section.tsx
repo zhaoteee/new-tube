@@ -16,16 +16,68 @@ import { trpc } from "@/trpc/client";
 import Link from "next/link";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
+import { Skeleton } from "@/components/ui/skeleton";
 export const VideosSection = () => {
   return (
-    <Suspense fallback={<p>Loading...</p>}>
+    <Suspense fallback={<VideosSectionSkeleton />}>
       <ErrorBoundary fallback={<p>error</p>}>
         <VideosSectionSuspense />
       </ErrorBoundary>
     </Suspense>
   );
 };
-
+const VideosSectionSkeleton = () => {
+  return (
+    <div className="border-y">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="pl-6 w-[510px]">Video</TableHead>
+            <TableHead>Visibility</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead className="text-right">Views</TableHead>
+            <TableHead className="text-right">Comments</TableHead>
+            <TableHead className="text-right pr-6">Likes</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <TableRow className="cursor-pointer" key={index}>
+              <TableCell className="pl-6">
+                <div className="flex items-center gap-4">
+                  <Skeleton className="h-20 w-36" />
+                  <div className="flex flex-col gap-2">
+                    <Skeleton className="h-4 w-[100px]" />
+                    <Skeleton className="h-4 w-[150px]" />
+                  </div>
+                </div>
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-[150px]" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-[150px]" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-20" />
+              </TableCell>
+              <TableCell className="text-right text-sm">
+                <Skeleton className="h-4 w-16" />
+              </TableCell>
+              <TableCell className="text-right text-sm">
+                <Skeleton className="h-4 w-20" />
+              </TableCell>
+              <TableCell className="text-right text-sm pr-6">
+                <Skeleton className="h-4 w-18" />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+};
 const VideosSectionSuspense = () => {
   const [videos, query] = trpc.studio.getMany.useSuspenseInfiniteQuery(
     { limit: 5 },
@@ -58,7 +110,7 @@ const VideosSectionSuspense = () => {
                   key={video.id}
                 >
                   <TableRow className="cursor-pointer">
-                    <TableCell>
+                    <TableCell className="pl-6">
                       <div className="flex items-center gap-4">
                         <div className="reletive aspect-video w-36 shrink-0">
                           <VideoThumbnail
@@ -78,16 +130,22 @@ const VideosSectionSuspense = () => {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>Visibility</TableCell>
+                    <TableCell>{snakeCaseToTitle(video.visibility)}</TableCell>
                     <TableCell>
                       {snakeCaseToTitle(video.muxStatus || "error")}
                     </TableCell>
                     <TableCell>
                       {format(new Date(video.createdAt), "d MM yyyy")}
                     </TableCell>
-                    <TableCell>{video.title}</TableCell>
-                    <TableCell>{video.title}</TableCell>
-                    <TableCell>{video.title}</TableCell>
+                    <TableCell className="text-right text-sm">
+                      {video.title}
+                    </TableCell>
+                    <TableCell className="text-right text-sm">
+                      {video.title}
+                    </TableCell>
+                    <TableCell className="text-right text-sm pr-6">
+                      {video.title}
+                    </TableCell>
                   </TableRow>
                 </Link>
               ))}
