@@ -1,0 +1,14 @@
+<svg width="300" height="180" viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+  <!-- 整体灰色背景 -->
+  <rect width="300" height="180" rx="12" ry="12" fill="#333333"/>
+
+  <!-- 中央红色表情框 -->
+  <rect x="100" y="60" width="100" height="60" rx="10" ry="10" fill="#ff0000"/>
+
+  <!-- 表情眼睛 -->
+  <circle cx="130" cy="85" r="5" fill="#ffffff"/>
+  <circle cx="170" cy="85" r="5" fill="#ffffff"/>
+
+  <!-- 斜嘴 -->
+  <rect x="135" y="105" width="30" height="5" rx="2.5" fill="#ffffff" transform="rotate(-5 150 107.5)"/>
+</svg>

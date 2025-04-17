@@ -9,6 +9,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { format } from "date-fns";
+import { snakeCaseToTitle } from "@/lib/utils";
+import { VideoThumbnail } from "@/modules/videos/ui/components/video-thumbnail";
 import { trpc } from "@/trpc/client";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -55,10 +58,33 @@ const VideosSectionSuspense = () => {
                   key={video.id}
                 >
                   <TableRow className="cursor-pointer">
-                    <TableCell>{video.title}</TableCell>
-                    <TableCell>{video.title}</TableCell>
-                    <TableCell>{video.title}</TableCell>
-                    <TableCell>{video.title}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-4">
+                        <div className="reletive aspect-video w-36 shrink-0">
+                          <VideoThumbnail
+                            duration={video.duration}
+                            title={video.title}
+                            imgUrl={video.thumbnailUrl || ""}
+                            previewUrl={video.previewUrl}
+                          />
+                        </div>
+                        <div className="flex flex-col overflow-hidden gap-y-1">
+                          <span className="text-sm line-clamp-1">
+                            {video.title}
+                          </span>
+                          <span className="text-xs text-muted-foreground line-clamp-1">
+                            {video.description || "No description"}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>Visibility</TableCell>
+                    <TableCell>
+                      {snakeCaseToTitle(video.muxStatus || "error")}
+                    </TableCell>
+                    <TableCell>
+                      {format(new Date(video.createdAt), "d MM yyyy")}
+                    </TableCell>
                     <TableCell>{video.title}</TableCell>
                     <TableCell>{video.title}</TableCell>
                     <TableCell>{video.title}</TableCell>
