@@ -18,6 +18,7 @@ import {
   CopyIcon,
   Globe2Icon,
   ImagePlayIcon,
+  Loader2Icon,
   LockIcon,
   MoreVerticalIcon,
   RotateCcwIcon,
@@ -48,6 +49,7 @@ import { snakeCaseToTitle } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ThumbnailUploadModal } from "@/modules/studio/ui/components/thumbnail-upload-model";
+import { ThumbnailGenerateModal } from "@/modules/studio/ui/components/thumbnail-generate-model";
 
 interface Props {
   videoId: string;
@@ -69,6 +71,8 @@ function FormSectionSuspense({ videoId }: Props) {
   const utils = trpc.useUtils();
   const router = useRouter();
   const [thumbnailModalOpen, setThumbnailModalOpen] = useState(false);
+  const [thumbnailGenerateModalOpen, setThumbnailGenerateModalOpen] =
+    useState(false);
   const [video] = trpc.studio.getOne.useSuspenseQuery({ id: videoId });
   const [categories] = trpc.categories.getMany.useSuspenseQuery();
   const update = trpc.videos.update.useMutation({
@@ -91,6 +95,7 @@ function FormSectionSuspense({ videoId }: Props) {
       toast.error("Something went wrong");
     },
   });
+
   const restoreThumbnail = trpc.videos.restoreThumbnail.useMutation({
     onSuccess: () => {
       utils.studio.getMany.invalidate();
@@ -101,6 +106,28 @@ function FormSectionSuspense({ videoId }: Props) {
       toast.error("Something went wrong");
     },
   });
+
+  const generateTitle = trpc.videos.generateTitle.useMutation({
+    onSuccess: () => {
+      toast.info("Generating title from background", {
+        description: "This may take a while, please wait",
+      });
+    },
+    onError: () => {
+      toast.error("Something went wrong");
+    },
+  });
+  const generateDescription = trpc.videos.generateDescription.useMutation({
+    onSuccess: () => {
+      toast.info("Generating description from background", {
+        description: "This may take a while, please wait",
+      });
+    },
+    onError: () => {
+      toast.error("Something went wrong");
+    },
+  });
+
   const form = useForm<z.infer<typeof videoUpdateSchema>>({
     resolver: zodResolver(videoUpdateSchema),
     defaultValues: video,
@@ -124,6 +151,11 @@ function FormSectionSuspense({ videoId }: Props) {
       <ThumbnailUploadModal
         open={thumbnailModalOpen}
         onOpenChange={setThumbnailModalOpen}
+        videoId={video.id}
+      />
+      <ThumbnailGenerateModal
+        open={thumbnailGenerateModalOpen}
+        onOpenChange={setThumbnailGenerateModalOpen}
         videoId={video.id}
       />
       <Form {...form}>
@@ -163,7 +195,25 @@ function FormSectionSuspense({ videoId }: Props) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Title
+                      <div className="flex items-center gap-2">
+                        Title
+                        <Button
+                          size="icon"
+                          variant="outline"
+                          type="button"
+                          className="rounded-full size-6"
+                          onClick={() => generateTitle.mutate({ id: video.id })}
+                          disabled={
+                            generateTitle.isPending || !video.muxTrackId
+                          }
+                        >
+                          {generateTitle.isPending ? (
+                            <Loader2Icon className="animate-spin size-3" />
+                          ) : (
+                            <SparklesIcon className="size-3" />
+                          )}
+                        </Button>
+                      </div>
                       {/* add AI generate button */}
                     </FormLabel>
                     <FormControl>
@@ -182,7 +232,27 @@ function FormSectionSuspense({ videoId }: Props) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Description
+                      <div className="flex items-center gap-2">
+                        Description
+                        <Button
+                          size="icon"
+                          variant="outline"
+                          type="button"
+                          className="rounded-full size-6"
+                          onClick={() =>
+                            generateDescription.mutate({ id: video.id })
+                          }
+                          disabled={
+                            generateDescription.isPending || !video.muxTrackId
+                          }
+                        >
+                          {generateDescription.isPending ? (
+                            <Loader2Icon className="animate-spin size-3" />
+                          ) : (
+                            <SparklesIcon className="size-3" />
+                          )}
+                        </Button>
+                      </div>
                       {/* add AI generate button */}
                     </FormLabel>
                     <FormControl>
@@ -230,7 +300,11 @@ function FormSectionSuspense({ videoId }: Props) {
                               <ImagePlayIcon className="size-4 mr-1" />
                               Change
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                setThumbnailGenerateModalOpen(true)
+                              }
+                            >
                               <SparklesIcon className="size-4 mr-1" />
                               AI-generated
                             </DropdownMenuItem>

@@ -14,8 +14,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
-export default function StudioSideBar() {
+const StudioSideBar = () => {
   const pathname = usePathname();
+  console.log("StudioSideBar");
   return (
     <Sidebar className="pt-16 z-40" collapsible="icon">
       <SidebarContent className="bg-background">
@@ -48,4 +49,5 @@ export default function StudioSideBar() {
       </SidebarContent>
     </Sidebar>
   );
-}
+};
+export default React.memo(StudioSideBar);

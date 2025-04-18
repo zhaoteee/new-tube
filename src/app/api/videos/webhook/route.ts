@@ -10,6 +10,7 @@ import {
 } from "@mux/mux-node/resources/webhooks";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
+// import { UTApi } from "uploadthing/server";
 type WebhookEvent =
   | VideoAssetCreatedWebhookEvent
   | VideoAssetErroredWebhookEvent
@@ -46,6 +47,7 @@ export const POST = async (request: Request) => {
       break;
     }
     case "video.asset.ready": {
+      console.log("video.asset.ready");
       const data = payload.data as VideoAssetReadyWebhookEvent["data"];
       const playbackId = data.playback_ids?.[0].id;
       if (!playbackId) {
@@ -54,8 +56,17 @@ export const POST = async (request: Request) => {
       if (!data.upload_id) {
         return new Response("No upload ID found", { status: 400 });
       }
-      const thumbnail = `https://image.mux.com/${playbackId}/thumbnail.jpg`;
-      const previewUrl = `https://image.mux.com/${playbackId}/animated.gif`;
+      const tempThumbnail = `https://image.mux.com/${playbackId}/thumbnail.jpg`;
+      const tempPreviewUrl = `https://image.mux.com/${playbackId}/animated.gif`;
+      // 传输时间过长
+      // const utapi = new UTApi();
+      // const [uploadedThumbnail, uploadedPreview] =
+      //   await utapi.uploadFilesFromUrl([tempThumbnail, tempPreviewUrl]);
+      // if (!uploadedPreview.data || !uploadedThumbnail.data) {
+      //   return new Response("Failed to upload thumbnail or preview", {
+      //     status: 400,
+      //   });
+      // }
       const duration = data.duration ? Math.round(data.duration * 1000) : 0;
       await db
         .update(videos)
@@ -63,8 +74,8 @@ export const POST = async (request: Request) => {
           muxAssetId: data.id,
           muxStatus: data.status,
           muxPlaybackId: playbackId,
-          thumbnailUrl: thumbnail,
-          previewUrl,
+          thumbnailUrl: tempThumbnail,
+          previewUrl: tempPreviewUrl,
           duration,
         })
         .where(eq(videos.muxUploadId, data.upload_id));
@@ -101,7 +112,7 @@ export const POST = async (request: Request) => {
       }
       await db
         .update(videos)
-        .set({ muxTrackId: trackId, muxStatus: status })
+        .set({ muxTrackId: trackId, muxTrackStatus: status })
         .where(eq(videos.muxAssetId, assetId));
       break;
     }
