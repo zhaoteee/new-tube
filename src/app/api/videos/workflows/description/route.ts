@@ -35,7 +35,7 @@ export const { POST } = serve(async (context) => {
     return text;
   });
 
-  const { status, body } = await context.api.openai.call(
+  const { body } = await context.api.openai.call(
     "Call qwen-plus get description",
     {
       baseURL: "https://dashscope.aliyuncs.com/compatible-mode",

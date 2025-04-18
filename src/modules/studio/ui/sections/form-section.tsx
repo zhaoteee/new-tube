@@ -271,7 +271,7 @@ function FormSectionSuspense({ videoId }: Props) {
               <FormField
                 control={form.control}
                 name="thumbnailUrl"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
                     <FormLabel>Thumbnail</FormLabel>
                     <FormControl>

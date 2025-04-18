@@ -38,14 +38,14 @@ export const ThumbnailGenerateModal = ({
   });
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { prompt: "美丽的自然风景" },
+    defaultValues: { prompt: "美丽的自然风景,要有高山流水" },
   });
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
     generateThumbnail.mutate({
       prompt: values.prompt,
       id: videoId,
     });
+    onOpenChange(false);
   };
   return (
     <ResponsiveModal
