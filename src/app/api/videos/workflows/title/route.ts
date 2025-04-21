@@ -38,7 +38,7 @@ export const { POST } = serve(async (context) => {
     return text;
   });
 
-  const { status, body } = await context.api.openai.call("Call qwen-plus", {
+  const { body } = await context.api.openai.call("Call qwen-plus", {
     baseURL: "https://dashscope.aliyuncs.com/compatible-mode",
     token: process.env.OEPNAI_KEY!,
     operation: "chat.completions.create",

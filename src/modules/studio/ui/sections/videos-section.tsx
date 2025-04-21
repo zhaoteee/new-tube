@@ -26,6 +26,86 @@ export const VideosSection = () => {
     </Suspense>
   );
 };
+
+const VideosSectionSuspense = () => {
+  const [videos, query] = trpc.studio.getMany.useSuspenseInfiniteQuery(
+    { limit: 5 },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    }
+  );
+  return (
+    <div>
+      <div className="border-y">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="pl-6 w-[510px]">Video</TableHead>
+              <TableHead>Visibility</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead className="text-right">Views</TableHead>
+              <TableHead className="text-right">Comments</TableHead>
+              <TableHead className="text-right pr-6">Likes</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {videos.pages
+              .flatMap((page) => page.items)
+              .map((video) => (
+                <Link
+                  legacyBehavior
+                  href={`/studio/videos/${video.id}`}
+                  key={video.id}
+                >
+                  <TableRow className="cursor-pointer">
+                    <TableCell className="pl-6 ">
+                      <div className="flex items-center gap-4">
+                        <div className="reletive aspect-video w-36 shrink-0">
+                          <VideoThumbnail
+                            duration={video.duration}
+                            title={video.title}
+                            imgUrl={video.thumbnailUrl || ""}
+                            previewUrl={video.previewUrl}
+                          />
+                        </div>
+                        <div className="flex flex-col overflow-hidden gap-y-1 w-xl">
+                          <span className="text-sm line-clamp-1 text-ellipsis">
+                            {video.title}
+                          </span>
+                          <span className="text-xs text-muted-foreground  truncate">
+                            {video.description || "No description"}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{snakeCaseToTitle(video.visibility)}</TableCell>
+                    <TableCell>
+                      {snakeCaseToTitle(video.muxStatus || "error")}
+                    </TableCell>
+                    <TableCell>
+                      {format(new Date(video.createdAt), "d MM yyyy")}
+                    </TableCell>
+                    <TableCell className="text-right text-sm">22</TableCell>
+                    <TableCell className="text-right text-sm">333</TableCell>
+                    <TableCell className="text-right text-sm pr-6">
+                      444
+                    </TableCell>
+                  </TableRow>
+                </Link>
+              ))}
+          </TableBody>
+        </Table>
+      </div>
+      <InfiniteScroll
+        hasNextPage={query.hasNextPage}
+        isFetchingNextPage={query.isFetchingNextPage}
+        fetchNextPage={query.fetchNextPage}
+      ></InfiniteScroll>
+    </div>
+  );
+};
+
 const VideosSectionSkeleton = () => {
   return (
     <div className="border-y">
@@ -75,88 +155,6 @@ const VideosSectionSkeleton = () => {
           ))}
         </TableBody>
       </Table>
-    </div>
-  );
-};
-const VideosSectionSuspense = () => {
-  const [videos, query] = trpc.studio.getMany.useSuspenseInfiniteQuery(
-    { limit: 5 },
-    {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-    }
-  );
-  return (
-    <div>
-      <div className="border-y">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="pl-6 w-[510px]">Video</TableHead>
-              <TableHead>Visibility</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead className="text-right">Views</TableHead>
-              <TableHead className="text-right">Comments</TableHead>
-              <TableHead className="text-right pr-6">Likes</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {videos.pages
-              .flatMap((page) => page.items)
-              .map((video) => (
-                <Link
-                  legacyBehavior
-                  href={`/studio/videos/${video.id}`}
-                  key={video.id}
-                >
-                  <TableRow className="cursor-pointer">
-                    <TableCell className="pl-6">
-                      <div className="flex items-center gap-4">
-                        <div className="reletive aspect-video w-36 shrink-0">
-                          <VideoThumbnail
-                            duration={video.duration}
-                            title={video.title}
-                            imgUrl={video.thumbnailUrl || ""}
-                            previewUrl={video.previewUrl}
-                          />
-                        </div>
-                        <div className="flex flex-col overflow-hidden gap-y-1">
-                          <span className="text-sm line-clamp-1">
-                            {video.title}
-                          </span>
-                          <span className="text-xs text-muted-foreground line-clamp-1">
-                            {video.description || "No description"}
-                          </span>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{snakeCaseToTitle(video.visibility)}</TableCell>
-                    <TableCell>
-                      {snakeCaseToTitle(video.muxStatus || "error")}
-                    </TableCell>
-                    <TableCell>
-                      {format(new Date(video.createdAt), "d MM yyyy")}
-                    </TableCell>
-                    <TableCell className="text-right text-sm">
-                      {video.title}
-                    </TableCell>
-                    <TableCell className="text-right text-sm">
-                      {video.title}
-                    </TableCell>
-                    <TableCell className="text-right text-sm pr-6">
-                      {video.title}
-                    </TableCell>
-                  </TableRow>
-                </Link>
-              ))}
-          </TableBody>
-        </Table>
-      </div>
-      <InfiniteScroll
-        hasNextPage={query.hasNextPage}
-        isFetchingNextPage={query.isFetchingNextPage}
-        fetchNextPage={query.fetchNextPage}
-      ></InfiniteScroll>
     </div>
   );
 };

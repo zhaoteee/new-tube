@@ -2,7 +2,6 @@
 
 import { cn } from "@/lib/utils";
 import { VideoBanner } from "@/modules/videos/ui/components/video-banner";
-import { VideoOwner } from "@/modules/videos/ui/components/video-owner";
 import { VideoPlayer } from "@/modules/videos/ui/components/video-player";
 import { VideoTopRow } from "@/modules/videos/ui/components/video-top-row";
 import { trpc } from "@/trpc/client";
