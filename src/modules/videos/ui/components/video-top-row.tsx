@@ -9,14 +9,14 @@ import { useMemo } from "react";
 export const VideoTopRow = ({ video }: { video: VideoGetOneOutput }) => {
   const compactViews = useMemo(() => {
     return Intl.NumberFormat("en", { notation: "compact" }).format(
-      video.videoViews
+      video.viewCount
     );
-  }, [video.videoViews]);
+  }, [video.viewCount]);
   const expandedViews = useMemo(() => {
     return Intl.NumberFormat("en", { notation: "standard" }).format(
-      video.videoViews
+      video.viewCount
     );
-  }, [video.videoViews]);
+  }, [video.viewCount]);
   const compactDate = useMemo(() => {
     return formatDistanceToNow(video.createdAt, { addSuffix: true });
   }, [video.createdAt]);

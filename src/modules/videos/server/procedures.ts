@@ -47,7 +47,7 @@ export const videosRouter = createTRPCRouter({
           user: {
             ...getTableColumns(users),
           },
-          videoViews: db.$count(videoViews, eq(videoViews.videoId, videos.id)),
+          viewCount: db.$count(videoViews, eq(videoViews.videoId, videos.id)),
           likeCount: db.$count(
             videoReactions,
             and(
@@ -71,6 +71,80 @@ export const videosRouter = createTRPCRouter({
         .groupBy(videos.id, users.id, viewerReactions.type);
       if (!video) throw new TRPCError({ code: "NOT_FOUND" });
       return video;
+    }),
+  getNewOne: baseProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .query(async ({ input, ctx }) => {
+      const { clerkUserId } = ctx;
+
+      // 1. 获取当前登录用户 ID（如果有）
+      let userId: string | null = null;
+      if (clerkUserId) {
+        const [user] = await db
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.clerkId, clerkUserId));
+        userId = user?.id ?? null;
+      }
+
+      // 2. 获取视频详情 + 上传者信息
+      const [video] = await db
+        .select({
+          ...getTableColumns(videos),
+          user: { ...getTableColumns(users) },
+        })
+        .from(videos)
+        .innerJoin(users, eq(videos.userId, users.id))
+        .where(eq(videos.id, input.id));
+
+      if (!video) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      // 3. 聚合统计：浏览量、点赞数、点踩数
+      const [stats] = await db
+        .select({
+          viewCount: db.$count(videoViews, eq(videoViews.videoId, input.id)),
+          likeCount: db.$count(
+            videoReactions,
+            and(
+              eq(videoReactions.videoId, input.id),
+              eq(videoReactions.type, "like")
+            )
+          ),
+          disLikeCount: db.$count(
+            videoReactions,
+            and(
+              eq(videoReactions.videoId, input.id),
+              eq(videoReactions.type, "dislike")
+            )
+          ),
+        })
+        .from(videos)
+        .where(eq(videos.id, input.id)); // 不用 join，仅用于 count
+
+      // 4. 获取当前用户对视频的 reaction（如果登录了）
+      let viewerReaction: string | null = null;
+      if (userId) {
+        const [reaction] = await db
+          .select({ type: videoReactions.type })
+          .from(videoReactions)
+          .where(
+            and(
+              eq(videoReactions.videoId, input.id),
+              eq(videoReactions.userId, userId)
+            )
+          )
+          .limit(1);
+        viewerReaction = reaction?.type ?? null;
+      }
+
+      // 5. 返回组合数据
+      return {
+        ...video,
+        ...stats,
+        viewerReaction,
+      };
     }),
   generateDescription: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
