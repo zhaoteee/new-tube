@@ -2,8 +2,14 @@
 
 import { cn } from "@/lib/utils";
 import { VideoBanner } from "@/modules/videos/ui/components/video-banner";
-import { VideoPlayer } from "@/modules/videos/ui/components/video-player";
-import { VideoTopRow } from "@/modules/videos/ui/components/video-top-row";
+import {
+  VideoPlayer,
+  VideoPlayerSkeleton,
+} from "@/modules/videos/ui/components/video-player";
+import {
+  VideoTopRow,
+  VideoTopRowSkeleton,
+} from "@/modules/videos/ui/components/video-top-row";
 import { trpc } from "@/trpc/client";
 import { useAuth } from "@clerk/nextjs";
 import { Suspense } from "react";
@@ -11,14 +17,19 @@ import { ErrorBoundary } from "react-error-boundary";
 
 export const VideoSection = ({ videoId }: { videoId: string }) => {
   return (
-    <Suspense fallback={<p>Loadng....</p>}>
+    <Suspense fallback={<VideoSectionSkeleton />}>
       <ErrorBoundary fallback={<p>Error</p>}>
         <VideoSectionSuspense videoId={videoId}></VideoSectionSuspense>
       </ErrorBoundary>
     </Suspense>
   );
 };
-
+const VideoSectionSkeleton = () => (
+  <>
+    <VideoPlayerSkeleton />
+    <VideoTopRowSkeleton />
+  </>
+);
 export const VideoSectionSuspense = ({ videoId }: { videoId: string }) => {
   const { isSignedIn } = useAuth();
   const utils = trpc.useUtils();

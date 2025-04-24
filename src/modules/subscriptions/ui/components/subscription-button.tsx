@@ -20,7 +20,7 @@ export const SubscriptionButton = ({
     <Button
       onClick={onClick}
       disabled={disabled}
-      className={cn("rounded-full", className)}
+      className={cn("rounded-full cursor-pointer", className)}
       size={size}
       variant={isSubscribed ? "secondary" : "default"}
     >
