@@ -7,9 +7,11 @@ import { UserAvatar } from "@/components/user-avatar";
 import { cn } from "@/lib/utils";
 import { UserInfo } from "@/modules/users/ui/components/user-info";
 import { VideoGetManyOutput } from "@/modules/videos/types";
+import { VideoMenu } from "@/modules/videos/ui/components/video-menu";
 import { VideoThumbnail } from "@/modules/videos/ui/components/video-thumbnail";
 import { cva, VariantProps } from "class-variance-authority";
 import Link from "next/link";
+import { useMemo } from "react";
 
 const videoRowCardVariants = cva("group flex min-w-0", {
   variants: {
@@ -44,7 +46,17 @@ export const VideoRowCardSkeleton = () => {
 };
 
 export const VideoRowCard = ({ data, size, onRemove }: VideoRowCardPorps) => {
-  console.log(size);
+  const compactViews = useMemo(() => {
+    return Intl.NumberFormat("en", { notation: "compact" }).format(
+      data.viewCount
+    );
+  }, [data.viewCount]);
+  const compactLikes = useMemo(() => {
+    return Intl.NumberFormat("en", { notation: "compact" }).format(
+      data.likeCount
+    );
+  }, [data.likeCount]);
+
   return (
     <div className={cn(videoRowCardVariants({ size }))}>
       <Link
@@ -72,7 +84,7 @@ export const VideoRowCard = ({ data, size, onRemove }: VideoRowCardPorps) => {
             </h3>
             {size === "default" && (
               <p className="text-xs text-muted-foreground mt-1">
-                {data.viewCount} views | {data.likeCount} likes
+                {compactViews} views | {compactLikes} likes
               </p>
             )}
             {size === "default" && (
@@ -101,7 +113,16 @@ export const VideoRowCard = ({ data, size, onRemove }: VideoRowCardPorps) => {
                 </Tooltip>
               </>
             )}
+            {size === "compact" && <UserInfo size="sm" name={data.user.name} />}
+            {size === "compact" && (
+              <p className="text-xs text-muted-foreground mt-1">
+                {compactViews} views | {compactLikes} likes
+              </p>
+            )}
           </Link>
+          <div className="flex-none">
+            <VideoMenu videoId={data.id} onRemove={onRemove} />
+          </div>
         </div>
       </div>
     </div>

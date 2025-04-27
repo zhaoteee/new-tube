@@ -145,7 +145,16 @@ function FormSectionSuspense({ videoId }: Props) {
       toast.error("Something went wrong");
     },
   });
-
+  const revalidate = trpc.videos.revalidate.useMutation({
+    onSuccess: () => {
+      utils.studio.getMany.invalidate();
+      utils.studio.getOne.invalidate({ id: videoId });
+      toast.success("revalidated successfully");
+    },
+    onError: () => {
+      toast.error("Something went wrong");
+    },
+  });
   const restoreThumbnail = trpc.videos.restoreThumbnail.useMutation({
     onSuccess: () => {
       utils.studio.getMany.invalidate();
@@ -235,6 +244,11 @@ function FormSectionSuspense({ videoId }: Props) {
                     onClick={() => remove.mutate({ id: video.id })}
                   >
                     <TrashIcon className="size-4 mr-2" /> Delete
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => revalidate.mutate({ id: video.id })}
+                  >
+                    <RotateCcwIcon className="size-4 mr-2" /> Revalidate
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
