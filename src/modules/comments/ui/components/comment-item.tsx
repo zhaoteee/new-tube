@@ -8,11 +8,14 @@ import {
 import { UserAvatar } from "@/components/user-avatar";
 import { cn } from "@/lib/utils";
 import { CommentsGetManyOutput } from "@/modules/comments/types";
+import { CommentForm } from "@/modules/comments/ui/components/comment-form";
+import { CommentReplies } from "@/modules/comments/ui/components/comment-replies";
 import { trpc } from "@/trpc/client";
 import { useAuth, useClerk } from "@clerk/nextjs";
-import { error } from "console";
 import { formatDistanceToNow } from "date-fns";
 import {
+  ChevronDownIcon,
+  ChevronUpIcon,
   MessageSquareCode,
   MoreVerticalIcon,
   ThumbsDownIcon,
@@ -20,16 +23,21 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export const CommentItem = ({
   comment,
+  variant = "comment",
 }: {
   comment: CommentsGetManyOutput["items"][number];
+  variant?: "reply" | "comment";
 }) => {
   const { userId } = useAuth();
   const clerk = useClerk();
   const utils = trpc.useUtils();
+  const [isReplyOpen, setIsReplyOpen] = useState(false);
+  const [isRepliesOpen, setIsRepliesOpen] = useState(false);
   const remove = trpc.comments.remove.useMutation({
     onSuccess: () => {
       toast.success("Comment deleted");
@@ -70,7 +78,7 @@ export const CommentItem = ({
       <div className="flex gap-4">
         <Link href={`/users/${comment.userId}`}>
           <UserAvatar
-            size="lg"
+            size={variant === "reply" ? "sm" : "lg"}
             imageUrl={comment.user.imageUrl}
             name={comment.user.name}
           />
@@ -126,6 +134,16 @@ export const CommentItem = ({
                 {comment.dislikeCount}
               </span>
             </div>
+            {variant === "comment" && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 text-sm"
+                onClick={() => setIsReplyOpen(true)}
+              >
+                Reply
+              </Button>
+            )}
           </div>
         </div>
         <DropdownMenu modal={false}>
@@ -135,10 +153,13 @@ export const CommentItem = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => {}}>
-              <MessageSquareCode className="size-4" />
-              Reply
-            </DropdownMenuItem>
+            {variant === "comment" && (
+              <DropdownMenuItem onClick={() => setIsReplyOpen(true)}>
+                <MessageSquareCode className="size-4" />
+                Reply
+              </DropdownMenuItem>
+            )}
+
             {comment.user.clerkId === userId && (
               <DropdownMenuItem
                 onClick={() => {
@@ -152,6 +173,36 @@ export const CommentItem = ({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      {isReplyOpen && variant === "comment" && (
+        <div className="mt-4 pl-14">
+          <CommentForm
+            videoId={comment.videoId}
+            variant="reply"
+            parentId={comment.id}
+            onCancel={() => {
+              setIsReplyOpen(false);
+            }}
+            onSuccess={() => {
+              setIsReplyOpen(false);
+              setIsRepliesOpen(true);
+            }}
+          />
+        </div>
+      )}
+      {comment.replyCount > 0 && variant === "comment" && (
+        <div className="pl-14">
+          <Button
+            variant="tertiary"
+            onClick={() => setIsRepliesOpen((p) => !p)}
+          >
+            {isRepliesOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+            {comment.replyCount} replies
+          </Button>
+        </div>
+      )}
+      {comment.replyCount > 0 && variant === "comment" && isRepliesOpen && (
+        <CommentReplies parentId={comment.id} videoId={comment.videoId} />
+      )}
     </div>
   );
 };

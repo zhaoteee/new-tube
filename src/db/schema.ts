@@ -1,4 +1,4 @@
-import { Many, relations } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
   pgTable,
   text,
@@ -162,13 +162,20 @@ export const comments = pgTable(
       columns: [t.parentId],
       foreignColumns: [t.id],
       name: "comments_parent_id_fkey",
-    }),
+    }).onDelete("cascade"),
   ]
 );
 
-export const commentRelations = relations(comments, ({ one }) => ({
+export const commentRelations = relations(comments, ({ one, many }) => ({
   user: one(users, { fields: [comments.userId], references: [users.id] }),
   video: one(videos, { fields: [comments.videoId], references: [videos.id] }),
+  parent: one(comments, {
+    fields: [comments.parentId],
+    references: [comments.id],
+    relationName: "comments_parent_id_fkey",
+  }),
+  reactions: many(commentReactions),
+  replies: many(comments, { relationName: "comments_parent_id_fkey" }),
 }));
 
 export const commentSelectSchema = createSelectSchema(comments);
@@ -198,7 +205,7 @@ export const commentReactions = pgTable(
 
 export const commentReactionRelations = relations(
   commentReactions,
-  ({ one, many }) => ({
+  ({ one }) => ({
     user: one(users, {
       fields: [commentReactions.commentId],
       references: [users.id],
@@ -207,7 +214,6 @@ export const commentReactionRelations = relations(
       fields: [commentReactions.commentId],
       references: [comments.id],
     }),
-    reactions: many(commentReactions),
   })
 );
 

@@ -12,9 +12,15 @@ import { z } from "zod";
 export const CommentForm = ({
   videoId,
   onSuccess,
+  onCancel,
+  parentId,
+  variant = "comment",
 }: {
   videoId: string;
+  parentId?: string;
   onSuccess?: () => void;
+  onCancel?: () => void;
+  variant?: "reply" | "comment";
 }) => {
   const formSchema = z.object({
     value: z.string().min(1),
@@ -41,7 +47,7 @@ export const CommentForm = ({
     defaultValues: { value: "" },
   });
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    create.mutate({ ...values, videoId });
+    create.mutate({ ...values, videoId, parentId });
   };
   return (
     <Form {...form}>
@@ -62,7 +68,11 @@ export const CommentForm = ({
                 <FormControl>
                   <Textarea
                     {...field}
-                    placeholder="Add a comment"
+                    placeholder={
+                      variant === "reply"
+                        ? "Reply to this comment..."
+                        : "Add a comment"
+                    }
                     rows={10}
                     className="resize-none bg-transparent overflow-hidden min-h-0 h-20"
                   />
@@ -71,8 +81,20 @@ export const CommentForm = ({
             )}
           />
           <div className="justify-end gap-2 mt-2 flex">
+            {onCancel && (
+              <Button
+                variant="ghost"
+                type="button"
+                onClick={() => {
+                  form.reset();
+                  onCancel();
+                }}
+              >
+                Cancel
+              </Button>
+            )}
             <Button type="submit" size="sm" disabled={create.isPending}>
-              Comment
+              {variant === "reply" ? "Reply" : "Comment"}
             </Button>
           </div>
         </div>
