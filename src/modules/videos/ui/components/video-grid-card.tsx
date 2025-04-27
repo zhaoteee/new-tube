@@ -1,8 +1,12 @@
+import { Skeleton } from "@/components/ui/skeleton";
 import { UserAvatar } from "@/components/user-avatar";
 import { UserInfo } from "@/modules/users/ui/components/user-info";
 import { VideoGetManyOutput } from "@/modules/videos/types";
 import { VideoMenu } from "@/modules/videos/ui/components/video-menu";
-import { VideoThumbnail } from "@/modules/videos/ui/components/video-thumbnail";
+import {
+  VideoThumbnail,
+  VideoThumbnailSkeleton,
+} from "@/modules/videos/ui/components/video-thumbnail";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -55,3 +59,16 @@ export const VideoGridCard = ({ data, onRemove }: VideoGridCardPorps) => {
     </div>
   );
 };
+export const VideoGridCardSkeleton = () => (
+  <div className="flex flex-col gap-2 w-full group">
+    <VideoThumbnailSkeleton />
+    <div className="flex gap-3">
+      <Skeleton className="w-8 h-8 rounded-full" />
+      <div className="min-w-0 flex-1">
+        <Skeleton className="w-full h-6" />
+        <Skeleton className="w-6 h-6" />
+        <Skeleton className="w-10 h-6" />
+      </div>
+    </div>
+  </div>
+);

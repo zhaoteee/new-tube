@@ -8,7 +8,10 @@ import { cn } from "@/lib/utils";
 import { UserInfo } from "@/modules/users/ui/components/user-info";
 import { VideoGetManyOutput } from "@/modules/videos/types";
 import { VideoMenu } from "@/modules/videos/ui/components/video-menu";
-import { VideoThumbnail } from "@/modules/videos/ui/components/video-thumbnail";
+import {
+  VideoThumbnail,
+  VideoThumbnailSkeleton,
+} from "@/modules/videos/ui/components/video-thumbnail";
 import { cva, VariantProps } from "class-variance-authority";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -41,8 +44,16 @@ interface VideoRowCardPorps extends VariantProps<typeof videoRowCardVariants> {
   onRemove?: () => void;
 }
 
-export const VideoRowCardSkeleton = () => {
-  return <div>VideoRowCardSkeleton</div>;
+export const VideoRowCardSkeleton = ({
+  size,
+}: VariantProps<typeof videoRowCardVariants>) => {
+  return (
+    <div className={videoRowCardVariants({ size })}>
+      <div className={thumbnailVariants({ size })}>
+        <VideoThumbnailSkeleton />
+      </div>
+    </div>
+  );
 };
 
 export const VideoRowCard = ({ data, size, onRemove }: VideoRowCardPorps) => {
