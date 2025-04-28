@@ -34,7 +34,6 @@ const HomeVideosSkeleton = () => (
   </div>
 );
 export function HomeVideosSectionSuspense({ categoryId }: Props) {
-  const router = useRouter();
   const [videos, query] = trpc.videos.getMany.useSuspenseInfiniteQuery(
     {
       categoryId,
