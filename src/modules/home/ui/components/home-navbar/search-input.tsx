@@ -1,19 +1,21 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { SearchIcon, XIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
 export default function SearchInput() {
   const router = useRouter();
-  const [value, setValue] = useState("");
+  const params = useSearchParams();
+  const query = params.get("query");
+  const [value, setValue] = useState(query || "");
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const url = new URL(
       "/search",
       process.env.VERCEL_URL
         ? `https://${process.env.VERCEL_URL}`
-        : "http://localhost:3000s"
+        : "http://localhost:3000"
     );
     const newQuery = value.trim();
     url.searchParams.set("query", encodeURIComponent(newQuery));

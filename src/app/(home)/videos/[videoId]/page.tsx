@@ -1,6 +1,7 @@
 import { DEFAULT_LIMIT } from "@/constant";
 import { VideoView } from "@/modules/videos/ui/views/video-view";
 import { HydrateClient, trpc } from "@/trpc/server";
+export const dynamic = "force-dynamic";
 
 export default async function Page({
   params,
