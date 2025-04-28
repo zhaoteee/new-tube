@@ -43,8 +43,5 @@ export const VideoThumbnailSkeleton = () => (
     <div className="reletive w-full overflow-hidden rounded-xl aspect-video">
       <Skeleton className="size-full object-cover group-hover:opacity-0" />
     </div>
-    <div className="absolute bottom-2 right-2 px-1 py-0.5 rounded bg-black/80 text-white text-xs font-medium">
-      <Skeleton className="w-10 h-6" />
-    </div>
   </div>
 );

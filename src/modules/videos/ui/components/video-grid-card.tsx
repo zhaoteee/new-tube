@@ -41,14 +41,17 @@ export const VideoGridCard = ({ data, onRemove }: VideoGridCardPorps) => {
         </Link>
         <div className="min-w-0 flex-1">
           <Link href={`/videos/${data.id}`}>
-            <h3 className="font-medium line-clamp-2 text-base break-words">
+            <h3 className="font-medium line-clamp-1 text-base break-words">
               {data.title}
             </h3>
           </Link>
           <Link href={`/users/${data.user.id}`}>
             <UserInfo name={data.user.name} />
           </Link>
-          <Link href={`/videos/${data.id}`}>
+          <Link
+            href={`/videos/${data.id}`}
+            className="text-xs text-muted-foreground"
+          >
             {compactViews} views * {compactDate}
           </Link>
         </div>
