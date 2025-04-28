@@ -25,7 +25,6 @@ import {
   lt,
   or,
 } from "drizzle-orm";
-import { useId } from "react";
 // import { UTApi } from "uploadthing/server";
 import { z } from "zod";
 export const videosRouter = createTRPCRouter({
@@ -41,14 +40,15 @@ export const videosRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const { id: userId } = ctx.user;
       const { cursor, limit } = input;
-      const viewerSubscriptions = db
-        .$with("viewer_subscriptions")
-        .as(
-          db
-            .select({ userId: subscriptions.creatorId })
-            .from(subscriptions)
-            .where(eq(subscriptions.viewerId, userId))
-        );
+      const viewerSubscriptions = db.$with("viewer_subscriptions").as(
+        db
+          .select({
+            userId: subscriptions.creatorId,
+            videoId: subscriptions.videoId,
+          })
+          .from(subscriptions)
+          .where(eq(subscriptions.viewerId, userId))
+      );
       const data = await db
         .with(viewerSubscriptions)
         .select({
@@ -79,6 +79,7 @@ export const videosRouter = createTRPCRouter({
         .where(
           and(
             eq(videos.visibility, "public"),
+            eq(videos.id, viewerSubscriptions.videoId),
             cursor
               ? or(
                   lt(videos.updatedAt, cursor.updatedAt),
@@ -251,7 +252,12 @@ export const videosRouter = createTRPCRouter({
         db
           .select()
           .from(subscriptions)
-          .where(inArray(subscriptions.viewerId, userId ? [userId] : []))
+          .where(
+            and(
+              inArray(subscriptions.viewerId, userId ? [userId] : []),
+              eq(subscriptions.videoId, input.id)
+            )
+          )
       );
       const [video] = await db
         .with(viewerReactions, viewerSubscriptions)
@@ -261,7 +267,10 @@ export const videosRouter = createTRPCRouter({
             ...getTableColumns(users),
             subscriberCount: db.$count(
               subscriptions,
-              eq(subscriptions.creatorId, users.id)
+              and(
+                eq(subscriptions.creatorId, users.id),
+                eq(subscriptions.videoId, input.id)
+              )
             ),
             viewerSubscribed: isNotNull(viewerSubscriptions.viewerId).mapWith(
               Boolean

@@ -60,13 +60,14 @@ export const subscriptions = pgTable(
     creatorId: uuid("creator_id")
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
+    videoId: uuid("video_id").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (t) => [
     primaryKey({
       name: "subscriptions_pk",
-      columns: [t.viewerId, t.creatorId],
+      columns: [t.viewerId, t.creatorId, t.videoId],
     }),
   ]
 );

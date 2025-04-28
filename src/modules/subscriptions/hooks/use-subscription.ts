@@ -5,7 +5,7 @@ import { toast } from "sonner";
 interface UserSubscriptionProps {
   userId: string;
   isSubscribed: boolean;
-  fromVideoId?: string;
+  fromVideoId: string;
 }
 export const useSubscription = ({
   userId,
@@ -47,9 +47,9 @@ export const useSubscription = ({
   const isPending = subcribe.isPending || subcribe.isPending;
   const onClick = () => {
     if (isSubscribed) {
-      unsubscribe.mutate({ userId });
+      unsubscribe.mutate({ userId, videoId: fromVideoId });
     } else {
-      subcribe.mutate({ userId });
+      subcribe.mutate({ userId, videoId: fromVideoId });
     }
   };
   return { isPending, onClick };

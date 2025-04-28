@@ -7,22 +7,22 @@ import { z } from "zod";
 
 export const subscriptionsRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(z.object({ userId: z.string().uuid() }))
+    .input(z.object({ userId: z.string().uuid(), videoId: z.string().uuid() }))
     .mutation(async ({ input, ctx }) => {
-      const { userId } = input;
+      const { userId, videoId } = input;
       if (userId === ctx.user.id) {
         throw new TRPCError({ code: "BAD_REQUEST" });
       }
       const [subscription] = await db
         .insert(subscriptions)
-        .values({ viewerId: ctx.user.id, creatorId: userId })
+        .values({ viewerId: ctx.user.id, creatorId: userId, videoId })
         .returning();
       return subscription;
     }),
   remove: protectedProcedure
-    .input(z.object({ userId: z.string().uuid() }))
+    .input(z.object({ userId: z.string().uuid(), videoId: z.string().uuid() }))
     .mutation(async ({ input, ctx }) => {
-      const { userId } = input;
+      const { userId, videoId } = input;
       if (userId === ctx.user.id) {
         throw new TRPCError({ code: "BAD_REQUEST" });
       }
@@ -31,7 +31,8 @@ export const subscriptionsRouter = createTRPCRouter({
         .where(
           and(
             eq(subscriptions.viewerId, ctx.user.id),
-            eq(subscriptions.creatorId, userId)
+            eq(subscriptions.creatorId, userId),
+            eq(subscriptions.videoId, videoId)
           )
         )
         .returning();
