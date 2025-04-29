@@ -1,6 +1,5 @@
 import { ResponsiveModal } from "@/components/resonsive-modal";
 import { trpc } from "@/trpc/client";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { DEFAULT_LIMIT } from "@/constant";
@@ -12,9 +11,6 @@ interface CreateProps {
   onOpenChange: (open: boolean) => void;
   videoId: string;
 }
-const formSchema = z.object({
-  name: z.string().min(1),
-});
 export const PlaylistsOpenModal = ({
   open,
   onOpenChange,

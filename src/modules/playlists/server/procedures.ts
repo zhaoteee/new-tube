@@ -10,7 +10,6 @@ import {
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq, getTableColumns, lt, or, sql } from "drizzle-orm";
-import { useId } from "react";
 // import { UTApi } from "uploadthing/server";
 import { z } from "zod";
 export const playlistsRouter = createTRPCRouter({
@@ -60,8 +59,8 @@ export const playlistsRouter = createTRPCRouter({
         limit: z.number().min(1).max(100),
       })
     )
-    .query(async ({ input, ctx }) => {
-      const { id: userId } = ctx.user;
+    .query(async ({ input }) => {
+      // const { id: userId } = ctx.user;
       const { cursor, limit, playlistId } = input;
       const videosFromPlaylist = db.$with("playlist__videos").as(
         db

@@ -7,7 +7,6 @@ import {
   VideoGridCardSkeleton,
 } from "@/modules/videos/ui/components/video-grid-card";
 import { trpc } from "@/trpc/client";
-import { useRouter } from "next/navigation";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 interface Props {
