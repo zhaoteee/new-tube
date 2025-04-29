@@ -1,4 +1,3 @@
-import { HistoryVideosSection } from "@/modules/playlists/ui/sections/history-videos-section";
 import { LikedVideosSection } from "@/modules/playlists/ui/sections/liked-videos-section";
 
 export default function LikedView() {
